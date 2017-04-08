@@ -56,7 +56,7 @@ while True:
                     print(" ")
                 print("-----------------------------------------------")
                 print("Goodbye " + str(data[2]) + " your highscore is: " +
-                      str(new_total_time))
+                      time.strftime("%H:%M:%S", time.gmtime(new_total_time)))
                 print("-----------------------------------------------")
 
             else:   # is not logged in => log hen in

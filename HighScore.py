@@ -19,7 +19,7 @@ while True:
 
         for i in range(0, len(rows)):
             print(str(i+1) + ": " + str(rows[i][2]).ljust(10) +
-                  " score: " + str(rows[i][4]))
+                  " score: " + time.strftime("%H:%M:%S", time.gmtime(rows[i][4])))
 
         print("------------- People online ------")
 
