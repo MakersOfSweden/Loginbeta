@@ -5,13 +5,13 @@
 import sqlite3 as lite
 import time
 import requests
-import hasher
+import util
 import getpass
 while True:
     while True:
         try:
             temp = getpass.getpass("Blip me! ")
-            rfId = hasher.encode(temp)
+            rfId = util.encode(temp)
             break
         except ValueError:
             print("Blip not recognised")
@@ -55,8 +55,7 @@ while True:
                 except:
                     print(" ")
                 print("-----------------------------------------------")
-                print("Goodbye " + str(data[2]) + " your highscore is: " +
-                      time.strftime("%H:%M:%S", time.gmtime(new_total_time)))
+                print("Goodbye " + str(data[2]) + " your highscore is: " + util.toString(new_total_time))
                 print("-----------------------------------------------")
 
             else:   # is not logged in => log hen in

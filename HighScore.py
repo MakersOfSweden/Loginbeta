@@ -5,6 +5,7 @@ import sqlite3 as lite
 import requests
 import os
 import time
+import util
 
 while True:
     os.system('clear')
@@ -19,7 +20,7 @@ while True:
 
         for i in range(0, len(rows)):
             print(str(i+1) + ": " + str(rows[i][2]).ljust(10) +
-                  " score: " + time.strftime("%H:%M:%S", time.gmtime(rows[i][4])))
+                  " score: " + util.toString(rows[i][4]))
 
         print("------------- People online ------")
 
