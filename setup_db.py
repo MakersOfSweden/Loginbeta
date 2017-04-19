@@ -4,7 +4,7 @@
 
 import sqlite3 as lite
 import time
-import hasher
+import util
 
 con = lite.connect('People.db')
 
