@@ -7,7 +7,8 @@ import time
 import requests
 import util
 import getpass
-while True:
+
+def blipp():
     while True:
         try:
             temp = getpass.getpass("Blip me! ")
@@ -19,7 +20,11 @@ while True:
         except ValueError:
             print("Blip not recognised")
     print("")
+    
+    return rfId
 
+while True:
+    rfId = blipp()
     con = lite.connect('People.db')
     with con:
         cur = con.cursor()
@@ -29,27 +34,32 @@ while True:
         if data is None:  # there is no user with this ID tag
             print("-----------------------------------------------")
             print('There is no rfidtag named ', rfId, ' creating instance!')
+            
+            print("To verify correct reading please blipp tag again.")
+            
+            if blipp() == rfId:
+                nick_temp = input("input your nick: ")
+                if nick_temp:
+                    temp = cur.lastrowid
+                    if temp is None:
+                        temp_id = 1
+                    else:
+                        temp_id = temp + 1
 
-            nick_temp = input("input your nick: ")
-            if nick_temp:
-                temp = cur.lastrowid
-                if temp is None:
-                    temp_id = 1
+                    cur.execute("INSERT INTO People VALUES (?,?,?,?,?,?);",
+                                (temp_id, rfId, nick_temp, 1, 0, time.time()))
+                    requests.put('http://127.0.0.1:5001/', json = {'who': nick_temp, 'what': "login"})
+                    try:
+                        requests.get('http://192.168.42.12:5000/',timeout=0.001)
+                    except:
+                        print(" ")
+                    print('you now exist and are logged in! dont forget to logout!')
+                    print("-----------------------------------------------")
                 else:
-                    temp_id = temp + 1
-
-                cur.execute("INSERT INTO People VALUES (?,?,?,?,?,?);",
-                            (temp_id, rfId, nick_temp, 1, 0, time.time()))
-                requests.put('http://127.0.0.1:5001/', json = {'who': nick_temp, 'what': "login"})
-                try:
-                    requests.get('http://192.168.42.12:5000/',timeout=0.001)
-                except:
-                    print(" ")
-                print('you now exist and are logged in! dont forget to logout!')
-                print("-----------------------------------------------")
+                    #Empty nick abort
+                    print("Nick empty blip again")
             else:
-                #Empty nick abort
-                print("Nick empty blip again")
+                print("Tagg not the same as earlier please try again")
         else:           # there is user with this ID tag
             if data[3] is 1:  # is logged in => log hen out
                 time_spent = time.time() - data[5]
