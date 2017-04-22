@@ -31,21 +31,25 @@ while True:
             print('There is no rfidtag named ', rfId, ' creating instance!')
 
             nick_temp = input("input your nick: ")
-            temp = cur.lastrowid
-            if temp is None:
-                temp_id = 1
-            else:
-                temp_id = temp + 1
+            if nick_temp:
+                temp = cur.lastrowid
+                if temp is None:
+                    temp_id = 1
+                else:
+                    temp_id = temp + 1
 
-            cur.execute("INSERT INTO People VALUES (?,?,?,?,?,?);",
-                        (temp_id, rfId, nick_temp, 1, 0, time.time()))
-            requests.put('http://127.0.0.1:5001/', json = {'who': nick_temp, 'what': "login"})
-            try:
-                requests.get('http://192.168.42.12:5000/',timeout=0.001)
-            except:
-                print(" ")
-            print('you now exist and are logged in! dont forget to logout!')
-            print("-----------------------------------------------")
+                cur.execute("INSERT INTO People VALUES (?,?,?,?,?,?);",
+                            (temp_id, rfId, nick_temp, 1, 0, time.time()))
+                requests.put('http://127.0.0.1:5001/', json = {'who': nick_temp, 'what': "login"})
+                try:
+                    requests.get('http://192.168.42.12:5000/',timeout=0.001)
+                except:
+                    print(" ")
+                print('you now exist and are logged in! dont forget to logout!')
+                print("-----------------------------------------------")
+            else:
+                #Empty nick abort
+                print("Nick empty blip again")
         else:           # there is user with this ID tag
             if data[3] is 1:  # is logged in => log hen out
                 time_spent = time.time() - data[5]
