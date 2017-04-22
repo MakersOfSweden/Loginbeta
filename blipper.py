@@ -11,8 +11,11 @@ while True:
     while True:
         try:
             temp = getpass.getpass("Blip me! ")
-            rfId = util.encode(temp)
-            break
+            if temp:
+                rfId = util.encode(temp)
+                break
+            else:
+                print("Tagg id empty try again")
         except ValueError:
             print("Blip not recognised")
     print("")
