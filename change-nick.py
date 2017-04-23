@@ -16,7 +16,5 @@ with con:
     oldnick = input("Enter user old nick:")
     newnick = input("Enter user new nick:")
     
-    print ("Oldnick: '"+oldnick+"'")
-    
     cur.execute("UPDATE People SET Nick = ? WHERE Nick = ?", (newnick, oldnick))
 

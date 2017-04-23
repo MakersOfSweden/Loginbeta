@@ -14,7 +14,7 @@ with con:
     cur = con.cursor()
     
     oldid = util.encode(getpass.getpass("Enter user old rfid:"))
-    newid = util.encode(getpass.getpass("Enter user ned rfid:"))
+    newid = util.encode(getpass.getpass("Enter user new rfid:"))
     
     cur.execute("UPDATE People SET blipId = ? WHERE blipId = ?", (newid, oldid))
 
