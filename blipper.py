@@ -38,6 +38,20 @@ def trigger_random_sound():
         pass
 
 
+def mark_as_logged_out(rfid):
+    cursor = connection.cursor()
+    cursor.execute('UPDATE People SET totalTime=totalTime + (strftime("%s", "now") - lastLogin), isHere=0 WHERE blipId=?', [rfId])
+
+
+def mark_as_logged_in(rfid):
+    cursor = connection.cursor()
+    cursor.execute('UPDATE People SET lastLogin=strftime("%s", "now"), isHere=1 WHERE blipId=?', [rfId])
+
+
+def fetch_user(rfid):
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM People WHERE blipId = ?", [rfId])
+    return cursor.fetchone()
 
 
 while True:
@@ -47,9 +61,7 @@ while True:
     connect.row_factory = lite.Row
 
     with connection:
-        cur = connection.cursor()
-        cur.execute("SELECT * FROM People WHERE blipId = ?", (rfId,))
-        data = cur.fetchone()
+        data = fetch_user(rfId)
 
         if not data:  # there is no user with this ID tag
             print("-----------------------------------------------")
@@ -67,23 +79,21 @@ while True:
             print("-----------------------------------------------")
         else:           # there is user with this ID tag
             if data['isHere']:  # is logged in => log hen out
-                time_spent = time.time() - data['lastLogin']
-                new_total_time = time_spent + data['totalTime']
-                cur.execute("UPDATE People SET totalTime=?, isHere=? WHERE blipId=?",
-                            (new_total_time, 0, rfId))
+                mark_as_logged_out(rfId)
 
                 log_action(data['Nick'], 'logout')
 
                 trigger_random_sound()
 
+                data = fetch_user(rfId)
+
                 print("-----------------------------------------------")
-                print("Goodbye " + str(data[2]) + " your highscore is: " +
+                print("Goodbye " + str(data['Nick']) + " your highscore is: " +
                       str(new_total_time))
                 print("-----------------------------------------------")
 
             else:   # is not logged in => log hen in
-                cur.execute("UPDATE People SET lastLogin=?, isHere=? WHERE blipId=?",
-                            (time.time(), 1, rfId))
+                mark_as_logged_in(rfId)
 
                 log_action(data['Nick'], 'login')
 
