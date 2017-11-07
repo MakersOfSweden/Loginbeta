@@ -12,18 +12,18 @@ def wait_for_valid_rfid():
     while True:
         try:
             temp = getpass.getpass("Blip me! ")
-            rfId = hasher.encode(temp)
+            rfid = hasher.encode(temp)
             break
         except ValueError:
             print("Blip not recognised")
     print("")
 
-    return rfId
+    return rfid
 
 
 def add_user(nick, rfid):
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO People VALUES (?,?,?,?,?);", (rfId, nick_temp, 1, 0, time.time()))
+    cursor.execute("INSERT INTO People VALUES (?,?,?,?,?);", (rfid, nick_temp, 1, 0, time.time()))
     return cursor.lastrowid
 
 
@@ -40,65 +40,64 @@ def trigger_random_sound():
 
 def mark_as_logged_out(rfid):
     cursor = connection.cursor()
-    cursor.execute('UPDATE People SET totalTime=totalTime + (strftime("%s", "now") - lastLogin), isHere=0 WHERE blipId=?', [rfId])
+    cursor.execute('UPDATE People SET totalTime=totalTime + (strftime("%s", "now") - lastLogin), isHere=0 WHERE blipId=?', [rfid])
 
 
 def mark_as_logged_in(rfid):
     cursor = connection.cursor()
-    cursor.execute('UPDATE People SET lastLogin=strftime("%s", "now"), isHere=1 WHERE blipId=?', [rfId])
+    cursor.execute('UPDATE People SET lastLogin=strftime("%s", "now"), isHere=1 WHERE blipId=?', [rfid])
 
 
 def fetch_user(rfid):
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM People WHERE blipId = ?", [rfId])
+    cursor.execute("SELECT * FROM People WHERE blipId = ?", [rfid])
     return cursor.fetchone()
 
 
 while True:
-    rfid = wait_for_valid_rfid()
+    rfid_tag_id = wait_for_valid_rfid()
 
     connection = lite.connect('People.db')
     connect.row_factory = lite.Row
 
     with connection:
-        data = fetch_user(rfId)
+        user = fetch_user(rfid_tag_id)
 
-        if not data:  # there is no user with this ID tag
+        if not user:  # there is no user with this ID tag
             print("-----------------------------------------------")
-            print('There is no rfidtag named ', rfId, ' creating instance!')
+            print('There is no rfidtag named {rfid}, creating user!'.format(rfid=rfid_tag_id))
 
-            nick_temp = input("input your nick: ")
+            new_user_nick = input("input your nick: ")
 
-            add_user(nick_temp, rfId)
+            add_user(new_user_nick, rfid_tag_id)
 
-            log_action(nick_temp, 'login')
+            log_action(new_user_nick, 'login')
 
             trigger_random_sound()
 
-            print('you now exist and are logged in! dont forget to logout!')
+            print('You now exist and are logged in! Dont forget to logout!')
             print("-----------------------------------------------")
         else:           # there is user with this ID tag
-            if data['isHere']:  # is logged in => log hen out
-                mark_as_logged_out(rfId)
+            if user['isHere']:  # is logged in => log hen out
+                mark_as_logged_out(rfid_tag_id)
 
-                log_action(data['Nick'], 'logout')
+                log_action(user['Nick'], 'logout')
 
                 trigger_random_sound()
 
-                data = fetch_user(rfId)
+                user = fetch_user(rfid_tag_id)
 
                 print("-----------------------------------------------")
-                print("Goodbye " + str(data['Nick']) + " your highscore is: " +
-                      str(new_total_time))
+                print('Goodbye {Nick}, your highscore is: {totalTime}'.format(**user))
                 print("-----------------------------------------------")
 
             else:   # is not logged in => log hen in
-                mark_as_logged_in(rfId)
+                mark_as_logged_in(rfid_tag_id)
 
-                log_action(data['Nick'], 'login')
+                log_action(user['Nick'], 'login')
 
                 trigger_random_sound()
 
                 print("-----------------------------------------------")
-                print("Welcome " + str(data['Nick']))
+                print("Welcome {Nick}!".format(**user))
                 print("-----------------------------------------------")
