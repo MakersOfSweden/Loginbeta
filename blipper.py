@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """Simple script for registering members coming and going. """
 
-import sqlite3 as lite
-import time
 import requests
 import hasher
 import getpass
