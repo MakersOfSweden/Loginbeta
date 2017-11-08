@@ -6,9 +6,25 @@ import requests
 import os
 import time
 
+
+def turn_lights_on():
+    try:
+        requests.get('http://192.168.42.10:5000/light/on', timeout=0.1)
+    except (requests.exceptions.Timeout, requests.ConnectionError):
+            pass
+
+def turn_lights_off():
+    try:
+        requests.get('http://192.168.42.10:5000/light/off', timeout=0.1)
+    except (requests.exceptions.Timeout, requests.ConnectionError):
+            pass
+
+
 while True:
     os.system('clear')
     con = lite.connect('People.db')
+    con.row_factory = lite.Row
+
     with con:
         cur = con.cursor()
 
@@ -17,9 +33,8 @@ while True:
         cur.execute("SELECT * FROM People ORDER BY totalTime DESC")
         rows = cur.fetchall()
 
-        for i in range(0, len(rows)):
-            print(str(i+1) + ": " + str(rows[i][2]).ljust(10) +
-                  " score: " + str(rows[i][4]))
+        for i, row in enumerate(rows):
+            print('{position}: {nick:10} score: {score}'.format(position=i+1, nick=row['Nick'], score=row['totalTime']))
 
         print("------------- People online ------")
 
@@ -28,16 +43,13 @@ while True:
         
         # display som people
         for row in rows:
-            print(str(row[2]).ljust(10))
+            print(row['Nick'].ljust(10))
         
         # prata med dorropnare och be dem tana
-        try:
-            if len(rows)>0:
-                requests.get('http://192.168.42.10:5000/light/on', timeout=0.1)
-            else:
-                requests.get('http://192.168.42.10:5000/light/off', timeout=0.1)
-        except (requests.exceptions.Timeout, requests.ConnectionError):
-            pass
+        if rows:
+            turn_lights_on()
+        else:
+            turn_lights_off()
 
 
     time.sleep(3)
