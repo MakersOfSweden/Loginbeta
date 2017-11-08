@@ -38,41 +38,29 @@ while True:
 
     user = users.fetch(rfid_tag_id)
 
+    print("-----------------------------------------------")
+
     if not user:
-        print("-----------------------------------------------")
         print('There is no rfidtag named {rfid}, creating user!'.format(rfid=rfid_tag_id))
 
         new_user_nick = input("input your nick: ")
-
         users.add(new_user_nick, rfid_tag_id)
-
         log_action(new_user_nick, 'login')
 
-        trigger_random_sound()
-
         print('You now exist and are logged in! Dont forget to logout!')
-        print("-----------------------------------------------")
     else:
         if user['isHere']:
             users.logout(rfid_tag_id)
-
             log_action(user['Nick'], 'logout')
-
-            trigger_random_sound()
-
             user = users.fetch(rfid_tag_id)
 
-            print("-----------------------------------------------")
             print('Goodbye {Nick}, your highscore is: {totalTime}'.format(**user))
-            print("-----------------------------------------------")
-
         else:
             users.login(rfid_tag_id)
-
             log_action(user['Nick'], 'login')
 
-            trigger_random_sound()
-
-            print("-----------------------------------------------")
             print("Welcome {Nick}!".format(**user))
-            print("-----------------------------------------------")
+
+    print("-----------------------------------------------")
+
+    trigger_random_sound()
