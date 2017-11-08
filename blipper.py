@@ -7,6 +7,7 @@ import time
 import requests
 import hasher
 import getpass
+import users
 
 def wait_for_valid_rfid():
     while True:
@@ -21,12 +22,6 @@ def wait_for_valid_rfid():
     return rfid
 
 
-def add_user(nick, rfid):
-    cursor = connection.cursor()
-    cursor.execute("INSERT INTO People VALUES (?,?,?,?,?);", (rfid, nick_temp, 1, 0, time.time()))
-    return cursor.lastrowid
-
-
 def log_action(who, what):
     requests.put('http://127.0.0.1:5001/', json = {'who': who, 'what': what})
 
@@ -38,66 +33,46 @@ def trigger_random_sound():
         pass
 
 
-def mark_as_logged_out(rfid):
-    cursor = connection.cursor()
-    cursor.execute('UPDATE People SET totalTime=totalTime + (strftime("%s", "now") - lastLogin), isHere=0 WHERE blipId=?', [rfid])
-
-
-def mark_as_logged_in(rfid):
-    cursor = connection.cursor()
-    cursor.execute('UPDATE People SET lastLogin=strftime("%s", "now"), isHere=1 WHERE blipId=?', [rfid])
-
-
-def fetch_user(rfid):
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM People WHERE blipId = ?", [rfid])
-    return cursor.fetchone()
-
-
 while True:
     rfid_tag_id = wait_for_valid_rfid()
 
-    connection = lite.connect('People.db')
-    connect.row_factory = lite.Row
+    user = users.fetch(rfid_tag_id)
 
-    with connection:
-        user = fetch_user(rfid_tag_id)
+    if not user:
+        print("-----------------------------------------------")
+        print('There is no rfidtag named {rfid}, creating user!'.format(rfid=rfid_tag_id))
 
-        if not user:  # there is no user with this ID tag
-            print("-----------------------------------------------")
-            print('There is no rfidtag named {rfid}, creating user!'.format(rfid=rfid_tag_id))
+        new_user_nick = input("input your nick: ")
 
-            new_user_nick = input("input your nick: ")
+        users.add(new_user_nick, rfid_tag_id)
 
-            add_user(new_user_nick, rfid_tag_id)
+        log_action(new_user_nick, 'login')
 
-            log_action(new_user_nick, 'login')
+        trigger_random_sound()
+
+        print('You now exist and are logged in! Dont forget to logout!')
+        print("-----------------------------------------------")
+    else:
+        if user['isHere']:
+            users.logout(rfid_tag_id)
+
+            log_action(user['Nick'], 'logout')
 
             trigger_random_sound()
 
-            print('You now exist and are logged in! Dont forget to logout!')
+            user = users.fetch(rfid_tag_id)
+
             print("-----------------------------------------------")
-        else:           # there is user with this ID tag
-            if user['isHere']:  # is logged in => log hen out
-                mark_as_logged_out(rfid_tag_id)
+            print('Goodbye {Nick}, your highscore is: {totalTime}'.format(**user))
+            print("-----------------------------------------------")
 
-                log_action(user['Nick'], 'logout')
+        else:
+            users.login(rfid_tag_id)
 
-                trigger_random_sound()
+            log_action(user['Nick'], 'login')
 
-                user = fetch_user(rfid_tag_id)
+            trigger_random_sound()
 
-                print("-----------------------------------------------")
-                print('Goodbye {Nick}, your highscore is: {totalTime}'.format(**user))
-                print("-----------------------------------------------")
-
-            else:   # is not logged in => log hen in
-                mark_as_logged_in(rfid_tag_id)
-
-                log_action(user['Nick'], 'login')
-
-                trigger_random_sound()
-
-                print("-----------------------------------------------")
-                print("Welcome {Nick}!".format(**user))
-                print("-----------------------------------------------")
+            print("-----------------------------------------------")
+            print("Welcome {Nick}!".format(**user))
+            print("-----------------------------------------------")
