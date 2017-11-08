@@ -5,19 +5,7 @@ import sqlite3 as lite
 import requests
 import os
 import time
-
-
-def turn_lights_on():
-    try:
-        requests.get('http://192.168.42.10:5000/light/on', timeout=0.1)
-    except (requests.exceptions.Timeout, requests.ConnectionError):
-            pass
-
-def turn_lights_off():
-    try:
-        requests.get('http://192.168.42.10:5000/light/off', timeout=0.1)
-    except (requests.exceptions.Timeout, requests.ConnectionError):
-            pass
+import lights
 
 
 while True:
@@ -47,9 +35,9 @@ while True:
         
         # prata med dorropnare och be dem tana
         if rows:
-            turn_lights_on()
+            lights.on()
         else:
-            turn_lights_off()
+            lights.off()
 
 
     time.sleep(3)
