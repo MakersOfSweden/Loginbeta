@@ -1,7 +1,7 @@
 import sqlite3
 
 _connection = sqlite3.connect('People.db')
-_connection.row_factory = lite.Row
+_connection.row_factory = sqlite3.Row
 
 
 def add(nick, rfid):
@@ -39,5 +39,6 @@ def highscore():
 
 
 def logout_all():
-	cursor = _connection.cursor()
+    cursor = _connection.cursor()
     cursor.execute("UPDATE People SET isHere = 0")
+
