@@ -6,6 +6,8 @@ import requests
 import hasher
 import getpass
 import users
+import time
+import settings
 
 def wait_for_valid_rfid():
     while True:
@@ -51,8 +53,14 @@ while True:
             users.logout(rfid_tag_id)
             log_action(user['Nick'], 'logout')
             user = users.fetch(rfid_tag_id)
-
-            print('Goodbye {Nick}, your highscore is: {totalTime}'.format(**user))
+            
+            if settings.TIME_FORMAT:
+                formattedTime = time.strftime(settings.TIME_FORMAT, time.gmtime(user['totalTIme']))
+            else:
+                formattedTime = user['totalTIme']
+            
+            print('Goodbye {Nick}, your highscore is: {totalTime}'.format(
+                Nick = user['Nick'], totalTime = formattedTime))
         else:
             users.login(rfid_tag_id)
             log_action(user['Nick'], 'login')

@@ -1,0 +1,5 @@
+
+
+# MakersLink format, μFabriken format is default
+#TIME_FORMAT = "%H:%M:%S"
+TIME_FORMAT = None
