@@ -11,8 +11,11 @@ def wait_for_valid_rfid():
     while True:
         try:
             temp = getpass.getpass("Blip me! ")
-            rfid = util.encode(temp)
-            break
+            if temp:
+                rfid = util.encode(temp)
+                break
+            else:
+                print("Tagg id empty try again")
         except ValueError:
             print("Blip not recognised")
     print("")
