@@ -1,14 +1,17 @@
 import hashlib
 import settings
-import time
 
 salt = "AhBaik4auv3Seihu"
 
 def encode(clearString):
     return hashlib.sha512(str.encode(salt + clearString)).hexdigest()
     
-def formatTime(totalTime):
-    if settings.TIME_FORMAT:
-        return time.strftime(settings.TIME_FORMAT, time.gmtime(totalTime))
+def formatTime(time):
+    if settings.TIME_FORMAT == "MakersLink":
+        time = int(time)
+        rest, sec = divmod(time, 60)
+        hour, min = divmod(rest, 60)
+    
+        return str(hour).rjust(2, "0")+":"+str(min).rjust(2, "0")+":"+str(sec).rjust(2, "0")
     else:
-        return totalTime
+        return time
