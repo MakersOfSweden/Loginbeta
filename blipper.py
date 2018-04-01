@@ -3,17 +3,15 @@
 """Simple script for registering members coming and going. """
 
 import requests
-import hasher
+import util
 import getpass
 import users
-import time
-import settings
 
 def wait_for_valid_rfid():
     while True:
         try:
             temp = getpass.getpass("Blip me! ")
-            rfid = hasher.encode(temp)
+            rfid = util.encode(temp)
             break
         except ValueError:
             print("Blip not recognised")
@@ -54,13 +52,8 @@ while True:
             log_action(user['Nick'], 'logout')
             user = users.fetch(rfid_tag_id)
             
-            if settings.TIME_FORMAT:
-                formattedTime = time.strftime(settings.TIME_FORMAT, time.gmtime(user['totalTIme']))
-            else:
-                formattedTime = user['totalTIme']
-            
             print('Goodbye {Nick}, your highscore is: {totalTime}'.format(
-                Nick = user['Nick'], totalTime = formattedTime))
+                Nick = user['Nick'], totalTime = util.formatTime(user['totalTime'])))
         else:
             users.login(rfid_tag_id)
             log_action(user['Nick'], 'login')
