@@ -4,7 +4,7 @@
 
 import sqlite3 as lite
 import time
-import hasher
+import util
 
 with lite.connect('People.db') as con:
 
@@ -16,7 +16,7 @@ with lite.connect('People.db') as con:
         "totalTime FLOAT, lastLogin FLOAT)"
     )
 
-    rfId = hasher.encode("2016050010")
+    rfId = util.encode("2016050010")
     nick_temp = 'Dalsmo'
     cur.execute("INSERT INTO People (blipId, Nick, isHere, totalTime, lastLogin) VALUES (?,?,?,?,?);",
                 (rfId, nick_temp, 1, 0, time.time()))
