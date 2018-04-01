@@ -43,15 +43,20 @@ while True:
 
     if not user:
         print('There is no rfidtag named {rfid}, creating user!'.format(rfid=rfid_tag_id))
+        print("To verify correct reading please blipp tag again.")
+        
+        if rfid_tag_id == wait_for_valid_rfid():
+            
+            new_user_nick = input("input your nick: ")
+            if new_user_nick:
+                users.add(new_user_nick, rfid_tag_id)
+                log_action(new_user_nick, 'login')
 
-        new_user_nick = input("input your nick: ")
-        if new_user_nick:
-            users.add(new_user_nick, rfid_tag_id)
-            log_action(new_user_nick, 'login')
-
-            print('You now exist and are logged in! Dont forget to logout!')
+                print('You now exist and are logged in! Dont forget to logout!')
+            else:
+                print('Provied nick empty blipp again.')
         else:
-            print('Provied nick empty blipp again.')
+            print("Tagg not the same as earlier please try again")
     else:
         if user['isHere']:
             users.logout(rfid_tag_id)
