@@ -5,6 +5,7 @@ import os
 import time
 import lights
 import users
+import util
 
 
 while True:
@@ -15,7 +16,7 @@ while True:
     highscore = users.highscore()
 
     for i, user in enumerate(highscore):
-        print('{position}: {nick:10} score: {score}'.format(position=i+1, nick=user['Nick'], score=user['totalTime']))
+        print('{position}: {nick:10} score: {score}'.format(position=i+1, nick=user['Nick'], score=util.formatTime(user['totalTime'])))
 
     print("---------- People online ----------")
 
