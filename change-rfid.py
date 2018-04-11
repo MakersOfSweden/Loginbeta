@@ -1,20 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Dev script to change user rfid. """
+"""Admin script to change user rfid. """
 
-import sqlite3 as lite
+import users
 import util
 import getpass
 
-dbName = input("Enter db to operate on:")
+oldid = util.encode(getpass.getpass("Enter user old rfid:"))
+newid = util.encode(getpass.getpass("Enter user new rfid:"))
 
-con = lite.connect(dbName)
-
-with con:
-    cur = con.cursor()
-    
-    oldid = util.encode(getpass.getpass("Enter user old rfid:"))
-    newid = util.encode(getpass.getpass("Enter user new rfid:"))
-    
-    cur.execute("UPDATE People SET blipId = ? WHERE blipId = ?", (newid, oldid))
-
+users.update_rfid(newid, oldid)

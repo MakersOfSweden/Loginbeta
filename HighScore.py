@@ -1,44 +1,34 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sqlite3 as lite
-import requests
 import os
 import time
+import lights
+import users
 import util
+
 
 while True:
     os.system('clear')
-    con = lite.connect('People.db')
-    with con:
-        cur = con.cursor()
 
-        print("------------ Highscore -----------")
+    print("------------ Highscore ------------")
 
-        cur.execute("SELECT * FROM People ORDER BY totalTime DESC")
-        rows = cur.fetchall()
+    highscore = users.highscore()
 
-        for i in range(0, len(rows)):
-            print(str(i+1) + ": " + str(rows[i][2]).ljust(10) +
-                  " score: " + util.toString(rows[i][4]))
+    for i, user in enumerate(highscore):
+        print('{position}: {nick:10} score: {score}'.format(position=i+1, nick=user['Nick'], score=util.formatTime(user['totalTime'])))
 
-        print("------------- People online ------")
+    print("---------- People online ----------")
 
-        cur.execute("SELECT * FROM People WHERE isHere = 1")
-        rows = cur.fetchall()
-        
-        # display som people
-        for row in rows:
-            print(str(row[2]).ljust(10))
-        
-        # prata med dorropnare och be dem tana
-        try:
-            if len(rows)>0:
-                requests.get('http://192.168.42.10:5000/light/on', timeout=0.1)
-            else:
-                requests.get('http://192.168.42.10:5000/light/off', timeout=0.1)
-        except (requests.exceptions.Timeout, requests.ConnectionError):
-            pass
+    logged_in_users = users.logged_in()
+    
+    for user in logged_in_users:
+        print(user['Nick'])
+    
+    if logged_in_users:
+        lights.on()
+    else:
+        lights.off()
 
 
     time.sleep(3)

@@ -6,20 +6,17 @@ import sqlite3 as lite
 import time
 import util
 
-con = lite.connect('People.db')
-
-with con:
+with lite.connect('People.db') as con:
 
     cur = con.cursor()
 
     cur.execute("DROP TABLE IF EXISTS People")
     cur.execute(
-        "CREATE TABLE People(Id INT, blipId INT, Nick TEXT, isHere INT," +
+        "CREATE TABLE People(Id INTEGER PRIMARY KEY AUTOINCREMENT, blipId INTEGER, Nick TEXT, isHere INTEGER," +
         "totalTime FLOAT, lastLogin FLOAT)"
     )
 
-    temp_id = 1
     rfId = util.encode("2016050010")
     nick_temp = 'Dalsmo'
-    cur.execute("INSERT INTO People VALUES (?,?,?,?,?,?);",
-                (temp_id, rfId, nick_temp, 1, 0, time.time()))
+    cur.execute("INSERT INTO People (blipId, Nick, isHere, totalTime, lastLogin) VALUES (?,?,?,?,?);",
+                (rfId, nick_temp, 1, 0, time.time()))
