@@ -28,7 +28,7 @@ def fetch(rfid):
     cursor = _connection.cursor()
     cursor.execute("SELECT * FROM People WHERE blipId = ?", [rfid])
     return cursor.fetchone()
-    
+
 def update_nick(newNick, oldNick):
     cursor = _connection.cursor()
     cursor.execute("UPDATE People SET Nick = ? WHERE Nick = ?", (newNick, oldNick))
@@ -69,7 +69,7 @@ def logout_all():
 
 def remove(nick):
     cursor = _connection.cursor()
-    cursor.execute("DELETE FROM People WHERE Nick = ?", (nick, )")
+    cursor.execute("DELETE FROM People WHERE Nick = ?", (nick, ))
     _connection.commit()
 
 def move_time(fromNick, toNick):

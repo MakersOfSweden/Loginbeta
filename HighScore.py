@@ -17,7 +17,7 @@ while True:
 
     for i, user in enumerate(highscore):
         print('{position}: {nick:10} score: {score}'.format(position=i+1, nick=user['Nick'], score=util.formatTime(user['totalTime'])))
-    time.sleep(0.1)
+        time.sleep(0.1)
 
     print("---------- People online ----------")
 
