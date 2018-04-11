@@ -39,6 +39,12 @@ def update_rfid(newRfid, oldRfid):
     cursor.execute("UPDATE People SET blipId = ? WHERE blipId = ?", (newRfid, oldRfid))
     _connection.commit()
 
+def change_rfid(newRfid, nick):
+    cursor = _connection.cursor()
+    cursor.execute("UPDATE People SET blipId = ? WHERE Nick = ?", (newRfid, nick))
+    _connection.commit()
+
+
 def purge_inactive_users():
     cursor = _connection.cursor()
     cursor.execute("DELETE FROM People WHERE totalTime < 60")
@@ -52,7 +58,7 @@ def logged_in():
 
 def highscore():
 	cursor = _connection.cursor()
-	cursor.execute("SELECT * FROM People ORDER BY totalTime DESC")
+	cursor.execute("SELECT * FROM People WHERE totalTime > 600 ORDER BY totalTime DESC")
 	return cursor.fetchall()
 
 
@@ -60,4 +66,19 @@ def logout_all():
     cursor = _connection.cursor()
     cursor.execute("UPDATE People SET isHere = 0")
     _connection.commit()
+
+def remove(nick):
+    cursor = _connection.cursor()
+    cursor.execute("DELETE FROM People WHERE Nick = ?", (nick, )")
+    _connection.commit()
+
+def move_time(fromNick, toNick):
+    cursor = _connection.cursor()
+
+    cursor.execute("SELECT SUM(totalTime) FROM People WHERE Nick = ? OR Nick = ?", (fromNick, toNick))
+    rows = cursor.fetchall()
+    cursor.execute("UPDATE People SET totalTime = ? WHERE Nick = ?", (str(rows[0][0]), toNick))
+
+    _connection.commit()
+
 
